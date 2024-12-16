@@ -17,6 +17,10 @@ class Account {
         $this->setPassword($password);
     }
 
+    public function setId(int $id) {
+        $this->id = $id;
+    }
+
     public function setUsername(string $username) {
         if (empty($username) || strlen($username) < 4) {
             throw new IncorrectValueFieldException(

@@ -1,6 +1,8 @@
 <?php
 namespace core\repositories;
 
-interface IAttachmentRepository extends IBaseRepository {
+require_once("Core/Repositories/IBaseRepository.php");
+
+interface IMessageRepository extends IBaseRepository {
 
 }
