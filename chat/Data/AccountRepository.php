@@ -97,6 +97,32 @@ class AccountRepository implements IAccountRepository {
         }
     }
 
+    public function getByUsername(string $username) {
+        $username = mysqli_real_escape_string($this->connection, $username);
+        $sql = "SELECT * FROM account WHERE username = '$username'";
+    
+        $result = mysqli_query($this->connection, $sql);
+    
+        if (!$result) {
+            throw new QueryException(
+                "Ошибка выполнения запроса: " . 
+                mysqli_error($this->connection)
+            );
+        }
+    
+        $data = mysqli_fetch_assoc($result);
+        if ($data) {
+            return new Account(
+                $data['id'], 
+                $data['username'], 
+                $data['email'], 
+                $data['password']
+            );
+        } else {
+            return null;
+        }
+    }
+
     public function checkUser(string $username, string $password): bool {
         $username = mysqli_real_escape_string(
             $this->connection,

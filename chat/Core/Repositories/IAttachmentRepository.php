@@ -4,5 +4,5 @@ namespace core\repositories;
 require_once("Core/Repositories/IBaseRepository.php");
 
 interface IAttachmentRepository extends IBaseRepository {
-
+    public function findByMessageId(int $messageId);
 }
