@@ -145,4 +145,10 @@ class AccountRepository implements IAccountRepository {
 
         return false;
     }
+
+    public function getEmailByUserName(string $username) {
+        $user = $this->getByUsername($username);
+
+        return $user->getEmail();
+    }
 }

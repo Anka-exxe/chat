@@ -10,8 +10,9 @@ require_once("Application/DTO/AddMessageRequest.php");
 require_once("Application/DTO/AddAttachmentRequest.php");
 require_once("Core/Exceptions/QueryException.php");
 require_once("Core/Entities/Account.php");
-require_once("Application/Interfaces/IFileUpload");
+require_once("Application/Interfaces/IFileUpload.php");
 require_once("Application/DTO/UploadFileRequest.php");
+require_once("Application/DTO/MessageResponce.php");
 
 use core\repositories\IAttachmentRepository;
 use application\interfaces\IMessageService;
@@ -47,15 +48,19 @@ class MessageService implements IMessageService {
     }
 
     public function addMessage(AddMessageRequest $messageRequest, AddAttachmentRequest $attachment = null) {
-        $fileToUpload = new UploadFileRequest(
-            $attachment->name,
-            $attachment->path
-        );
-        
-        try {
-            $this->fileUploadService->uploadFile($fileToUpload);
-        } catch(Exception $e) {
-            throw $e;
+        $fileToUpload = null;
+
+        if($attachment != null) {
+            $fileToUpload = new UploadFileRequest(
+                $attachment->name,
+                $attachment->path
+            );
+
+            try {
+                $this->fileUploadService->uploadFile($fileToUpload);
+            } catch(Exception $e) {
+                throw $e;
+            }
         }
 
         $message = new Message(
@@ -76,11 +81,11 @@ class MessageService implements IMessageService {
                 );
         }
 
-        if ($attachment) {
+        if ($attachment !== null) {
             $newAttachment = new Attachment(
-                $message->getId(), 
-                0,
-                $attachment->$fileToUpload->getFilePath,
+                0, 
+                $message->getId(),
+                $this->fileUploadService->getFilePath(),
                 $attachment->type
             );
 
@@ -98,25 +103,30 @@ class MessageService implements IMessageService {
     public function getMessages(): array {
         $messageArray = $this->messageRepository->getAll();
         $fullMessageInfo = [];
-
-        foreach($messageArray as $message) {
+    
+        foreach ($messageArray as $message) {
             $user = $this->accountRepository->findById($message->getUserId());
             $attachment = $this->attachmentRepository->findByMessageId($message->getId());
-
+            $imageUrl = $attachment === null ? "" : $attachment->getFilePath();
+    
             $fullMessageInfo[] = new MessageResponce(
                 $user->getUsername(),
                 $user->getEmail(),
                 $message->getText(),
-                $attachment->getFilePath(),
+                $imageUrl,
                 $message->getCreatedAt()
             );
         }
-
-        return $fullMessageInfo();
+    
+        return $fullMessageInfo;
     }
 
     private function getUserIdByUsername(string $username) {
-        $user = $this->accountRepository->getByUsername($username);
-        return $user->getId();
+        try {
+            $user = $this->accountRepository->getByUsername($username);
+            return $user->getId();
+        } catch (Exception $e) {
+            return null;
+        }
     }
 }

@@ -14,4 +14,5 @@ interface IAccountService {
     public function logIn(LoginRequest $loginRequest) : bool;
     public function getIdByUserName(string $username) : int;
     public function getUserById(int $userId) : Account;
+    public function getEmailByUserName(string $username);
 }

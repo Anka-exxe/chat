@@ -19,6 +19,6 @@ class MessageResponce {
         $this->email =$email;
         $this->text = $text;
         $this->attachmentUrl = $attachmentUrl;
-        $this->$date = $date;
+        $this->date = $date;
     }
 }

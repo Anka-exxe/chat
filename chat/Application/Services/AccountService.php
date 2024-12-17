@@ -64,4 +64,15 @@ class AccountService implements IAccountService {
     public function getUserById(int $userId) : Account {
         return $this->accountRepository->findById($userId);
     }
+
+    public function getEmailByUserName(string $username) {
+        try {
+            $userId = $this->getIdByUserName($username);
+            $user = $this->getUserById($userId);
+            
+            return $user->getEmail();
+        } catch (Exception $e) {
+            return null;
+        }
+    }
 }

@@ -1,6 +1,8 @@
 <?php
 namespace core\entities;
 
+require_once("Core/Exceptions/IncorrectValueFieldException.php");
+
 use core\exceptions;
 use core\exceptions\IncorrectValueFieldException;
 
