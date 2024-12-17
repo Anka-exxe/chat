@@ -48,6 +48,7 @@ class MessageService implements IMessageService {
 
     public function addMessage(AddMessageRequest $messageRequest, AddAttachmentRequest $attachment = null) {
         $fileToUpload = new UploadFileRequest(
+            $attachment->name,
             $attachment->path
         );
         
@@ -68,17 +69,29 @@ class MessageService implements IMessageService {
 
         try {
             $this->messageRepository->add($message);
+        } catch (QueryException $e) {
+            throw new QueryException(
+                "Error adding message: " .
+                $e->getMessage()
+                );
+        }
 
-            if ($attachment) {
-                $newAttachment = new Attachment(
-                    $message->getId(), 
-                    0,
-                    $attachment->$fileToUpload->getFilePath,
-                    $attachment->type
+        if ($attachment) {
+            $newAttachment = new Attachment(
+                $message->getId(), 
+                0,
+                $attachment->$fileToUpload->getFilePath,
+                $attachment->type
+            );
+
+            try {
+                $this->attachmentRepository->add($newAttachment);
+            } catch (QueryException $e) {
+                throw new QueryException(
+                    "Error adding message: " . 
+                    $e->getMessage()
                 );
             }
-        } catch (QueryException $e) {
-            throw new QueryException("Error adding message: " . $e->getMessage());
         }
     }
 
