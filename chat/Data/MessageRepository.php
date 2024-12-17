@@ -18,9 +18,7 @@ class MessageRepository implements IMessageRepository {
     }
 
     public function findById(int $id) {
-        $sql = "SELECT id, user_id, text, ip_address, user_agent, created_at 
-        FROM message 
-        WHERE id = $id";
+        $sql = "SELECT * FROM message WHERE id = $id";
 
         $result = mysqli_query($this->connection, $sql);
 
@@ -47,7 +45,7 @@ class MessageRepository implements IMessageRepository {
     }
 
     public function getAll(): array {
-        $sql = "SELECT id, user_id, text, ip_address, user_agent, created_at FROM message";
+        $sql = "SELECT * FROM message";
         $result = mysqli_query($this->connection, $sql);
         $messages = [];
 

@@ -83,31 +83,30 @@ class AttachmentRepository implements IAttachmentRepository {
     }
 
     public function findByMessageId(int $messageId) {
-        $messageId = mysqli_real_escape_string(
-            $this->connection,
-            $messageId
-        );
-
-        $sql = "SELECT FROM attachment WHERE message_id = $messageId";
-
+        $messageId = mysqli_real_escape_string($this->connection, $messageId);
+    
+        $sql = "SELECT * FROM attachment WHERE message_id = $messageId";
         $result = mysqli_query($this->connection, $sql);
-
+    
         if ($result) {
             $attachmentInfo = mysqli_fetch_assoc($result);
-
-            return new Attachment(
-                $attachmentInfo['id'], 
-                $attachmentInfo['message_id'], 
-                $attachmentInfo['file_path'], 
-                $attachmentInfo['file_type']
-            );
+            
+            if ($attachmentInfo) {
+                return new Attachment(
+                    (int)$attachmentInfo['id'], 
+                    (int)$attachmentInfo['message_id'], 
+                    $attachmentInfo['file_path'], 
+                    $attachmentInfo['file_type']
+                );
+            } else {
+                return null;
+            }
         } else {
             throw new QueryException(
                 "Ошибка выполнения запроса: " . 
                 mysqli_error($this->connection)
             );
         }
-
     }
 
     public function delete(int $id): bool {
